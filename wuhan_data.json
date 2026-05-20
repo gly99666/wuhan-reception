@@ -1,0 +1,217 @@
+{
+  "version": "1.0",
+  "last_update": "2026-05-20",
+  "stations": {
+    "airport": { "name": "武汉天河国际机场", "code": "T3" },
+    "stations": [
+      { "name": "武汉站（高铁站）", "type": "高铁" },
+      { "name": "武昌站", "type": "普速/高铁" },
+      { "name": "汉口站", "type": "普速/高铁" },
+      { "name": "武汉东站", "type": "城际/高铁" }
+    ]
+  },
+  "zones": {
+    "hankou": { "name": "汉口片区", "desc": "江汉区、江岸区" },
+    "wuchang": { "name": "武昌片区", "desc": "武昌区" },
+    "donghu": { "name": "东湖片区", "desc": "东湖风景区" },
+    "guanggu": { "name": "光谷片区", "desc": "东湖高新区" },
+    "xinzhou": { "name": "新洲片区", "desc": "新洲区（工厂）" }
+  },
+  "level_meta": {
+    "vvip":      { "name": "VVIP客户", "icon": "&#128081;", "color": "#BA7517", "bg": "#FAEEDA" },
+    "vip":       { "name": "VIP客户",  "icon": "&#128276;", "color": "#185FA5", "bg": "#E6F1FB" },
+    "important": { "name": "重要客户", "icon": "&#128142;", "color": "#534AB7", "bg": "#EEEDFE" },
+    "economy":   { "name": "普通客户", "icon": "&#127968;", "color": "#888", "bg": "#F5F5F5" }
+  },
+  "origin_names": {
+    "mainland": "中国大陆",
+    "hk_tw": "港澳台",
+    "usa": "美国",
+    "europe": "欧洲",
+    "mideast": "中东",
+    "sea": "东南亚",
+    "africa": "非洲",
+    "russia": "俄罗斯"
+  },
+  "venues": {
+    "hotel": {
+      "luxury": [
+        { "name": "武汉万达瑞华酒店", "address": "武昌区水果湖街东湖路138号", "price": "2800+", "score": "4.9", "feature": "大堂《东湖盛景图》载入基尼斯纪录，城景/湖景房，楚河汉街旁", "zone": "wuchang" },
+        { "name": "武汉泛海费尔蒙酒店", "address": "江汉区泛海CBD中央商务区", "price": "1800+", "score": "4.8", "feature": "蒂芙尼蓝泳池，20层空中大堂，8楼露台旋转楼梯", "zone": "hankou" },
+        { "name": "武汉马哥孛罗酒店", "address": "江岸区沿江大道159号", "price": "1500+", "score": "4.6", "feature": "270度江景房，恒温泳池，近黎黄陂路/江滩", "zone": "hankou" }
+      ],
+      "premium": [
+        { "name": "武汉新华voco酒店", "address": "江汉区新华路469号", "price": "800-1200", "score": "4.8", "feature": "IHG旗下高端品牌，云端落地窗，近万象城/菱角湖", "zone": "hankou" },
+        { "name": "武汉江汉路步行街美仑酒店", "address": "江汉区江汉路步行街", "price": "700-1000", "score": "4.8", "feature": "高空江景，步行可达江滩，近地铁2/6号线", "zone": "hankou" },
+        { "name": "武汉汉口喜来登大酒店", "address": "江汉区泛海CBD", "price": "800-1100", "score": "4.7", "feature": "万豪旗下，温水泳池，SPA中心，4个餐饮场所", "zone": "hankou" },
+        { "name": "武汉马哥孛罗酒店", "address": "江岸区沿江大道159号", "price": "1200-1500", "score": "4.6", "feature": "270度江景房，24小时餐饮服务，近黎黄陂路", "zone": "hankou" }
+      ],
+      "standard": [
+        { "name": "全季酒店（江汉路步行街恒隆广场店）", "address": "江汉区民意四路48号", "price": "400-500", "score": "4.8", "feature": "华住旗下，毗邻恒隆广场/会展中心，全屋智能", "zone": "hankou" },
+        { "name": "全季酒店（汉口新华路店）", "address": "江汉区新华路272号", "price": "400-500", "score": "4.8", "feature": "2025版新升级，近汉口站/万象城，湖畔美居", "zone": "hankou" },
+        { "name": "武汉广场汉口金融中心亚朵酒店", "address": "江汉区中国民生银行大厦", "price": "450-600", "score": "4.8", "feature": "亚朵旗下，免费停车，健身中心，近武商广场", "zone": "hankou" },
+        { "name": "武汉江汉路步行街高空亚朵酒店", "address": "江汉区江汉路地铁站H口", "price": "500-650", "score": "4.9", "feature": "高空落地窗江景夜景，免费干衣机，家庭房", "zone": "hankou" },
+        { "name": "武汉汉口1915百年保安洋行漫心府", "address": "江汉区江汉路步行街", "price": "500-700", "score": "4.9", "feature": "百年巴洛克洋房，健身中心，亲子房", "zone": "hankou" }
+      ],
+      "economy": [
+        { "name": "全季酒店（江汉路步行街高空江景店）", "address": "江汉区中山大道818号平安大厦46-50层", "price": "350-450", "score": "4.7", "feature": "高空一线江景，俯瞰城市美景，免费停车场", "zone": "hankou" },
+        { "name": "武汉江滩江汉路步行街轻居酒店", "address": "江汉区江汉路步行街", "price": "280-380", "score": "4.6", "feature": "全季旗下副牌，2分钟达江滩，24小时前台", "zone": "hankou" },
+        { "name": "武汉汇豪大酒店", "address": "江汉区循礼门地铁站", "price": "300-400", "score": "4.7", "feature": "近江滩/循礼门，免费停车，洗衣/健身中心", "zone": "hankou" },
+        { "name": "武汉汉口温德姆花园酒店", "address": "江汉区汉口火车站地铁站C口", "price": "350-450", "score": "4.8", "feature": "接机服务，免费停车，影音房，近汉口站", "zone": "hankou" }
+      ]
+    },
+    "partner_hotels": {
+      "juzi": {
+        "name": "桔子酒店（青年路店）",
+        "address": "江汉区青年路556号房开大厦",
+        "price": 298,
+        "breakfast": "含双早",
+        "desc": "协议酒店",
+        "zone": "hankou"
+      },
+      "mingzhu": [
+        { "room": "城景大床房", "price": 550, "breakfast": "双早", "zone": "hankou" },
+        { "room": "高级江景大床房", "price": 600, "breakfast": "双早", "zone": "hankou" },
+        { "room": "商务江景大床房", "price": 680, "breakfast": "单早", "zone": "hankou" }
+      ]
+    },
+    "restaurant": {
+      "local_luxury": [
+        { "name": "粗茶淡饭·壹号餐房（黎黄陂路俄租界·黑珍珠）", "zone": "hankou" },
+        { "name": "喜舍（江滩店·黑珍珠，招牌红汤甲鱼配油条）", "zone": "hankou" },
+        { "name": "湖滨客舍（东湖店·黑珍珠，九年蝉联）", "zone": "donghu" },
+        { "name": "渔歌·武昌鱼艺术餐厅（黑珍珠，传承红焖武昌鱼）", "zone": "wuchang" },
+        { "name": "丹青宴（武汉天地店·黑珍珠）", "zone": "hankou" },
+        { "name": "云庭荟·中国楚宴（光谷皇冠假日裙楼）", "zone": "guanggu" },
+        { "name": "楚禾宴（北辰光谷里店/光谷大道店）", "zone": "guanggu" },
+        { "name": "艳阳天·非遗楚菜（太平洋店）", "zone": "hankou" },
+        { "name": "湖锦酒楼（八一路店/沌口店/光谷店）", "zone": "wuchang" }
+      ],
+      "local_normal": [
+        { "name": "户部巷名小吃广场", "zone": "wuchang" },
+        { "name": "粮道街赵师傅油饼", "zone": "wuchang" },
+        { "name": "吉庆街夜市美食", "zone": "hankou" },
+        { "name": "万松园美食街", "zone": "hankou" },
+        { "name": "汉街大排档夜市", "zone": "wuchang" },
+        { "name": "粮道街过早一条街", "zone": "wuchang" }
+      ],
+      "western": [
+        { "name": "富力威斯汀Grange扒房（人均760元）", "zone": "hankou" },
+        { "name": "啫啫021法式铁板烧（武汉天地）", "zone": "hankou" },
+        { "name": "新極膳壹号馆（循礼门店·日料自助）", "zone": "hankou" },
+        { "name": "王品台塑牛排（中山公园）", "zone": "hankou" },
+        { "name": "GreyWhale灰鲸餐厅", "zone": "guanggu" },
+        { "name": "Panofusion域（41层江景）", "zone": "wuchang" },
+        { "name": "戈雅法餐厅（光谷）", "zone": "guanggu" }
+      ],
+      "halal": [
+        { "name": "清真大酒楼（武昌起义街）", "zone": "wuchang" },
+        { "name": "武汉麦加饭庄（八一路）", "zone": "wuchang" },
+        { "name": "老武汉清真菜馆（汉口）", "zone": "hankou" },
+        { "name": "法图麦饭庄（汉口）", "zone": "hankou" },
+        { "name": "FRIENDS CORNER巴基斯坦餐厅", "zone": "hankou" }
+      ],
+      "veg": [
+        { "name": "素莲素食餐厅（归元寺旁）", "zone": "hankou" },
+        { "name": "禅缘素食（东湖店）", "zone": "donghu" },
+        { "name": "香积厨素食", "zone": "wuchang" },
+        { "name": "德善素食馆", "zone": "wuchang" }
+      ]
+    },
+    "company": {
+      "hq":     { "name": "公司总部参观（江汉区金贸大厦D座）", "zone": "hankou" },
+      "factory": { "name": "工厂实地考察（新洲区邾城街骆畈村）", "zone": "xinzhou" },
+      "tea":    { "name": "总部商务茶歇（会议室 · 精致茶点）", "zone": "hankou" }
+    },
+    "sight": {
+      "culture": [
+        { "name": "黄鹤楼（江南三大名楼之首）", "zone": "wuchang", "type": "landmark", "cat": "文化" },
+        { "name": "湖北省博物馆（越王勾践剑·曾侯乙编钟）", "zone": "donghu", "type": "museum", "cat": "博物馆" },
+        { "name": "昙华林历史街区（文艺复古）", "zone": "wuchang", "type": "street", "cat": "街区" },
+        { "name": "古琴台", "zone": "hankou", "type": "landmark", "cat": "文化" },
+        { "name": "武汉博物馆", "zone": "hankou", "type": "museum", "cat": "博物馆" },
+        { "name": "归元禅寺（数罗汉祈福）", "zone": "hankou", "type": "temple", "cat": "寺庙" },
+        { "name": "古德寺（欧式拜占庭风格）", "zone": "hankou", "type": "temple", "cat": "寺庙" }
+      ],
+      "nature": [
+        { "name": "东湖绿道骑行", "zone": "donghu", "type": "park", "cat": "自然" },
+        { "name": "东湖磨山景区", "zone": "donghu", "type": "park", "cat": "自然" },
+        { "name": "东湖樱园（夜樱）", "zone": "donghu", "type": "park", "cat": "自然" },
+        { "name": "武汉植物园", "zone": "donghu", "type": "park", "cat": "自然" },
+        { "name": "九峰山森林公园", "zone": "guanggu", "type": "park", "cat": "自然" },
+        { "name": "武汉花博汇", "zone": "xinzhou", "type": "park", "cat": "自然" }
+      ],
+      "business": [
+        { "name": "武汉经济技术开发区（车谷工业游）", "zone": "guanggu", "type": "business", "cat": "商务" },
+        { "name": "光谷科技创新大走廊（中国光谷）", "zone": "guanggu", "type": "business", "cat": "商务" },
+        { "name": "武汉新港港区参观", "zone": "hankou", "type": "business", "cat": "商务" },
+        { "name": "武汉产业创新发展研究院", "zone": "guanggu", "type": "business", "cat": "商务" },
+        { "name": "中国光谷科技会展中心", "zone": "guanggu", "type": "business", "cat": "商务" }
+      ],
+      "modern": [
+        { "name": "武汉天地商业区漫步", "zone": "hankou", "type": "street", "cat": "街区" },
+        { "name": "楚河汉街购物", "zone": "wuchang", "type": "street", "cat": "街区" },
+        { "name": "武昌江滩步行", "zone": "wuchang", "type": "park", "cat": "自然" },
+        { "name": "武汉长江大桥（公铁两用）", "zone": "wuchang", "type": "landmark", "cat": "地标" },
+        { "name": "鹦鹉洲长江大桥（橘红色夜景）", "zone": "wuchang", "type": "landmark", "cat": "地标" },
+        { "name": "江汉路步行街（百年商业街）", "zone": "hankou", "type": "street", "cat": "街区" }
+      ],
+      "night": [
+        { "name": "长江荣耀号夜游游轮（汉口粤汉码头）", "zone": "hankou", "type": "night", "cat": "夜游" },
+        { "name": "知音号民国风情游轮", "zone": "hankou", "type": "night", "cat": "夜游" },
+        { "name": "江汉朝宗灯光秀（18公里）", "zone": "hankou", "type": "night", "cat": "夜景" },
+        { "name": "汉街夜景灯光秀", "zone": "wuchang", "type": "night", "cat": "夜景" },
+        { "name": "户部巷宵夜", "zone": "wuchang", "type": "street", "cat": "美食" },
+        { "name": "黎黄陂路历史文化街", "zone": "hankou", "type": "street", "cat": "街区" },
+        { "name": "吉庆街夜市", "zone": "hankou", "type": "street", "cat": "美食" }
+      ]
+    }
+  },
+  "seasonal_food": {
+    "spring": {
+      "months": [3, 4, 5],
+      "name": "春季鲜味",
+      "emoji": "🌸",
+      "dishes": ["🦩 油焖小龙虾（5月最佳，肉质饱满）", "🥦 藕带炒肉丝（春末限定，清脆爽口）", "🌿 春笋炒腊肉", "🇬🇧 荠菜春卷", "🥭 藕汤（排骨莲藕汤）", "🌶 热干面+蛋酒（武汉过早经典）"],
+      "restaurants": ["巴厘龙虾（万松园店）", "靓靓蒸虾（雪松路）", "沈记海鲜烧烤"],
+      "tips": "3月樱花季可安排东湖樱园赏樱+万松园小龙虾，一举两得"
+    },
+    "summer": {
+      "months": [6, 7, 8],
+      "name": "夏日盛宴",
+      "emoji": "🌡",
+      "dishes": ["🦀 油焖大虾/蒜蓉虾（龙虾消费季6-8月）", "🥙 凉拌毛豆+凉拌藕片", "🥛 冰镇绿豆汤", "🍜 凉面/凉皮", "🍽 清蒸武昌鱼", "🍇 面窝+欢喜坨"],
+      "restaurants": ["巴厘龙虾（雪松路总店）", "靓靓蒸虾", "虾皇（南京路）", "可可大虾"],
+      "tips": "夏季夜间推荐吉庆街夜市/汉街大排档，体验武汉宵夜文化"
+    },
+    "autumn": {
+      "months": [9, 10, 11],
+      "name": "金秋蟹宴",
+      "emoji": "🍁",
+      "dishes": ["🦀 梁子湖大闸蟹（9月底-11月最佳）", "🥩 腊肉炒洪山菜薹", "🍲 排骨藕汤（秋季莲藕最粉）", "🦞 清蒸鲈鱼", "🌳 桂花糍粑", "🌰 栗子烧鸡"],
+      "restaurants": ["湖锦酒楼（销品茂店）", "太子酒轩", "三五醇酒店", "楚鱼王"],
+      "tips": "10月武网期间光谷片区酒店紧张，建议提前1个月预订"
+    },
+    "winter": {
+      "months": [12, 1, 2],
+      "name": "暖冬腊味",
+      "emoji": "❄",
+      "dishes": ["🥩 腊肉/腊肠拼盘", "🍲 瓦罐鸡汤（鄂式滋补）", "🥭 排骨藕汤（武汉人冬日必备）", "🌮 豆皮（老通城三鲜豆皮）", "🍪 桂花糊米酒", "🌶 热干面+面窝"],
+      "restaurants": ["蔡林记（热干面）", "老通城（豆皮）", "四季美（汤包）", "小桃园（瓦罐鸡汤）"],
+      "tips": "冬季推荐安排室内活动为主，户部巷过早+湖北省博物馆是经典组合"
+    }
+  },
+  "wuhan_events": [
+    { "name": "武汉马拉松", "month": 3, "day": 22, "level": "high", "area": "汉口/武昌/东湖多区", "roads": "沿江大道、中山大道、长江大桥、东湖路、沙湖大桥等", "impact": "全城大范围交通管制，建议避开当天安排跨区活动", "tip": "约每年3月第三个周日，关注武汉马拉松官网确认具体日期" },
+    { "name": "樱花季（东湖/武大）", "month": 3, "day": 15, "endMonth": 4, "endDay": 5, "level": "medium", "area": "武昌区/东湖风景区", "roads": "鲁磨路、东湖绿道周边", "impact": "周末及节假日东湖周边严重拥堵，建议工作日前往或改乘地铁", "tip": "花期约3月中旬至4月上旬，建议安排在工作日赏樱" },
+    { "name": "武汉7·16渡江节", "month": 7, "day": 16, "level": "high", "area": "武昌临江大道/汉口江滩", "roads": "临江大道（彭刘杨西路至中山路）6:00-12:00封路", "impact": "长江两岸江滩区域交通管制，周边道路绕行", "tip": "7月16日固定举办，可安排高层包间观赛+江滩茶叙" },
+    { "name": "小龙虾消费季", "month": 5, "day": 1, "endMonth": 8, "endDay": 31, "level": "low", "area": "万松园/吉庆街/汉街", "roads": "无封路，但热门餐厅排队时间长", "impact": "万松园、雪松路等美食街晚间人流密集", "tip": "5月是吃虾最佳时节，建议提前预约包厢" },
+    { "name": "武汉网球公开赛（武网）", "month": 10, "day": 4, "endMonth": 10, "endDay": 12, "level": "medium", "area": "光谷国际网球中心", "roads": "高新大道、关山大道周边", "impact": "光谷片区酒店紧张，赛事期间周边交通压力增大", "tip": "光谷区酒店建议提前1个月预订，可安排观赛+光谷步行街" },
+    { "name": "光谷马拉松", "month": 11, "day": 15, "level": "medium", "area": "光谷片区/洪山区", "roads": "光谷广场周边、关山大道等", "impact": "光谷片区部分道路临时管制", "tip": "约每年11月中旬，关注官方公告确认具体日期和封路范围" },
+    { "name": "国庆黄金周", "month": 10, "day": 1, "endMonth": 10, "endDay": 7, "level": "high", "area": "全市热门景区", "roads": "景区周边道路", "impact": "黄鹤楼、东湖、户部巷等景点极度拥挤，酒店价格翻倍", "tip": "强烈建议避开10月1-3日出行高峰，错峰安排" },
+    { "name": "端午龙舟赛", "month": 6, "day": 1, "endMonth": 6, "endDay": 2, "level": "low", "area": "东湖/汉口江滩", "roads": "东湖周边", "impact": "局部交通管制，人流量增大", "tip": "可安排观赛+粽子品鉴，增添文化体验" },
+    { "name": "全国高考", "month": 6, "day": 7, "endMonth": 6, "endDay": 9, "level": "high", "area": "全市考点周边", "roads": "各考点周边200-500米道路封闭禁行，禁止鸣笛", "impact": "考点周边酒店被家长大量预订，部分区域交通严重拥堵", "tip": "高考期间务必避开考点区域安排商务行程，酒店需提前确认房源" },
+    { "name": "武汉市中考", "month": 6, "day": 20, "endMonth": 6, "endDay": 22, "level": "medium", "area": "全市考点周边", "roads": "各考点周边道路临时管控，限制车辆通行", "impact": "考点周边道路拥堵，部分公交线路临时调整", "tip": "中考影响范围略小于高考，但仍建议避开考点密集区域（武昌区、江汉区）" },
+    { "name": "春节/元宵", "month": 1, "day": 25, "endMonth": 2, "endDay": 15, "level": "medium", "area": "全市", "roads": "商圈周边拥堵", "impact": "部分餐厅歇业，高铁/机票紧张", "tip": "春节期间务必提前确认餐厅营业状态" }
+  ]
+}

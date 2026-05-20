@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>武汉客户接待规划助手 v1.8</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;background:#f5f6fa;color:#2c2c2a;font-size:14px}
+.header{background:#3C3489;color:white;padding:20px 24px;display:flex;align-items:center;gap:14px}
+.header-icon{width:40px;height:40px;background:#534AB7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:500}
+.header p{font-size:12px;opacity:0.75;margin-top:3px}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 80px)}
+.sidebar{background:white;border-right:0.5px solid #e0e0e0;padding:20px;overflow-y:auto;max-height:calc(100vh - 80px)}
+.main{padding:20px;overflow-y:auto;max-height:calc(100vh - 80px)}
+.section{margin-bottom:20px}
+.section-title{font-size:13px;font-weight:500;color:#3C3489;margin-bottom:10px;display:flex;align-items:center;gap:6px;padding-bottom:6px;border-bottom:1px solid #EEEDFE}
+.section-title .s-icon{font-size:15px}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border:0.5px solid #d0d0d0;border-radius:16px;font-size:12px;cursor:pointer;background:white;transition:all 0.18s;font-family:inherit;color:#444;user-select:none}
+.chip:hover{border-color:#534AB7;color:#534AB7;background:#EEEDFE}
+.chip.active{background:#534AB7;color:white;border-color:#534AB7}
+.chip.warn.active{background:#993C1D;border-color:#993C1D}
+.chip.danger.active{background:#A32D2D;border-color:#A32D2D;color:white}
+.chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.level-group{display:flex;gap:8px}
+.level-card{flex:1;border:1.5px solid #e0e0e0;border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.18s;background:white}
+.level-card:hover{border-color:#534AB7}
+.level-card.active{border-color:#534AB7;background:#EEEDFE}
+.level-card.active.vvip{border-color:#BA7517;background:#FAEEDA}
+.level-card.active.vip{border-color:#185FA5;background:#E6F1FB}
+.level-card .lv-icon{font-size:22px;margin-bottom:4px}
+.level-card .lv-name{font-size:12px;font-weight:500}
+.level-card .lv-desc{font-size:11px;color:#aaa;margin-top:2px}
+.gen-btn{width:100%;padding:13px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s;margin-top:4px;letter-spacing:0.5px}
+.gen-btn:hover{background:#3C3489}
+.gen-btn:disabled{background:#ccc;cursor:not-allowed}
+.reset-btn{width:100%;padding:9px;background:white;color:#666;border:0.5px solid #d0d0d0;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:8px}
+.reset-btn:hover{border-color:#534AB7;color:#534AB7}
+.summary-bar{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#3C3489;line-height:1.8}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan-card{background:white;border:0.5px solid #e0e0e0;border-radius:12px;overflow:hidden;transition:box-shadow 0.2s;cursor:pointer;position:relative}
+.plan-card:hover{box-shadow:0 4px 16px rgba(83,74,183,0.15);border-color:#AFA9EC}
+.plan-card.selected{border:2px solid #534AB7;box-shadow:0 4px 16px rgba(83,74,183,0.2)}
+.plan-badge{display:none;position:absolute;top:10px;right:10px;background:#534AB7;color:white;font-size:11px;padding:2px 8px;border-radius:10px;align-items:center;gap:3px}
+.plan-card.selected .plan-badge{display:flex}
+.plan-header{padding:14px 14px 10px;border-bottom:0.5px solid #f0f0f0}
+.plan-style{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.plan-style-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.plan-name{font-size:14px;font-weight:500;color:#2c2c2a}
+.plan-sub{font-size:12px;color:#888;margin-top:2px}
+.plan-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ptag{font-size:11px;padding:2px 7px;border-radius:4px;background:#f0f0f0;color:#666}
+.plan-body{padding:12px 14px}
+.plan-section{margin-bottom:10px}
+.ps-label{font-size:11px;color:#aaa;font-weight:500;margin-bottom:5px;letter-spacing:0.5px}
+.ps-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:5px}
+.ps-time{font-size:11px;color:#888;white-space:nowrap;min-width:36px;margin-top:1px}
+.ps-content .ps-name{font-size:12px;font-weight:500;color:#333}
+.ps-content .ps-note{font-size:11px;color:#999;margin-top:1px}
+.warn-box{background:#fff8f0;border:0.5px solid #ffd666;border-radius:6px;padding:8px 10px;font-size:11px;color:#854F0B;margin-top:8px;line-height:1.7}
+.warn-box .w-title{font-weight:500;margin-bottom:3px}
+.cost-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px 4px;background:#f8f8fc;border-top:0.5px solid #f0f0f0}
+.cost-label{font-size:12px;color:#888}
+.cost-val{font-size:16px;font-weight:500;color:#534AB7}
+.cost-detail{padding:2px 14px 10px;background:#f8f8fc}
+.cost-detail-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:11px;color:#666}
+.cost-detail-row .cd-icon{margin-right:4px}
+.cost-detail-row .cd-label{flex:1}
+.cost-detail-row .cd-val{font-weight:500;color:#534AB7;white-space:nowrap}
+.cost-detail-row:last-child{border-top:1px dashed #d8d8e8;margin-top:4px;padding-top:6px;font-size:12px;color:#333}
+.cost-detail-row:last-child .cd-val{font-weight:600}
+.empty-state{text-align:center;padding:60px 20px;color:#bbb}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:14px}
+.empty-sub{font-size:12px;margin-top:6px;color:#ccc}
+.loading{text-align:center;padding:48px;color:#888;font-size:14px}
+.spinner{display:inline-block;width:22px;height:22px;border:2px solid #e0e0e0;border-top-color:#534AB7;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.select-hint{font-size:11px;color:#aaa;margin-top:6px}
+.days-row{display:flex;gap:6px;align-items:center}
+.days-row input[type="number"]{width:64px;padding:5px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:13px;outline:none;font-family:inherit}
+.days-row input[type="number"]:focus{border-color:#534AB7}
+.days-row label{font-size:12px;color:#888}
+.days-tip{font-size:11px;color:#999;margin-top:4px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{max-height:none;border-right:none;border-bottom:0.5px solid #e0e0e0}.main{max-height:none}.plans-grid{grid-template-columns:1fr}}
+
+.date-row{display:flex;gap:8px;align-items:center}
+.date-row input[type="date"]{flex:1;padding:5px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:13px;outline:none;font-family:inherit}
+.date-row input[type="date"]:focus{border-color:#534AB7}
+.season-tip{background:#FFF8F0;border:0.5px solid #FFD666;border-radius:8px;padding:10px 12px;font-size:11px;color:#854F0B;line-height:1.8;margin-top:8px}
+.season-tip strong{color:#BA7517}
+.traffic-alert{background:#FFF1F0;border:0.5px solid #FFA39E;border-radius:8px;padding:10px 12px;font-size:11px;color:#A32D2D;line-height:1.8;margin-top:8px}
+.traffic-alert strong{color:#A32D2D}
+.food-recommend{background:#F0FFF4;border:0.5px solid #B7EB8F;border-radius:8px;padding:10px 12px;font-size:11px;color:#0F6E56;line-height:1.8;margin-top:8px}
+.food-recommend strong{color:#0F6E56}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">&#9968;</div>
+  <div>
+    <h1>武汉客户接待规划助手 <span style="font-size:11px;opacity:0.6" id="data-version"></span></h1>
+    <p>根据客户画像智能生成专属接待方案 · 支持国内外客户 · 涵盖民族/宗教禁忌</p>
+  </div>
+</div>
+<div class="layout">
+
+<div class="sidebar">
+  <!-- 需求1: 酒店预定等级（改名） -->
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#127968;</span> 酒店预定等级</div>
+    <div class="level-group">
+      <!-- 需求2: 统一emoji图标，大小22px -->
+      <div class="level-card" onclick="selectLevel('economy',this)">
+        <div class="lv-icon" style="font-size:22px">&#127968;</div>
+        <div class="lv-name">普通客户</div>
+        <div class="lv-desc">&#165;300-500/间</div>
+      </div>
+      <div class="level-card" onclick="selectLevel('important',this)">
+        <div class="lv-icon" style="font-size:22px">&#128142;</div>
+        <div class="lv-name">重要客户</div>
+        <div class="lv-desc">&#165;500-800/间</div>
+      </div>
+      <div class="level-card vip" onclick="selectLevel('vip',this)">
+        <div class="lv-icon" style="font-size:22px">&#128276;</div>
+        <div class="lv-name">VIP客户</div>
+        <div class="lv-desc">&#165;800-1200/间</div>
+      </div>
+      <div class="level-card vvip" onclick="selectLevel('vvip',this)">
+        <div class="lv-icon" style="font-size:22px">&#128081;</div>
+        <div class="lv-name">VVIP客户</div>
+        <div class="lv-desc">&#165;1200+/间</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 住宿需求配置 -->
+  <div class="section" style="background:#F0F7FF;border-radius:10px;padding:12px 14px;margin-top:4px">
+    <div class="section-title" style="border-bottom:none;margin-bottom:8px"><svg class="s-icon" width="16" height="16" viewBox="0 0 24 24" style="color:#534AB7;vertical-align:middle"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.34-4 4 1.34 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> 住宿需求</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:100px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">客户人数</label>
+        <input type="number" id="guest-count" value="1" min="1" max="50" style="width:100%;padding:6px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:13px;font-family:inherit" oninput="updateRoomCalc()">
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">房型</label>
+        <select id="room-type" style="width:100%;padding:6px 10px;border:0.5px solid #d0d0d0;border-radius:8px;font-size:13px;font-family:inherit" onchange="updateRoomCalc()">
+          <option value="single">单人间</option>
+          <option value="double" selected>大床房</option>
+          <option value="twin">双床房</option>
+          <option value="suite">套房</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#555;display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="share-room" onchange="updateRoomCalc()" style="width:16px;height:16px">
+        可接受合住（两人住一间）
+      </label>
+    </div>
+    <div id="room-summary" style="background:#E6F1FB;border-radius:6px;padding:8px 12px;font-size:12px;color:#185FA5;line-height:1.6">
+      <svg width="14" height="14" viewBox="0 0 24 24" style="color:#185FA5;vertical-align:middle"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> 客户总人数：<strong id="total-guests">1</strong>人<br>
+      <svg width="14" height="14" viewBox="0 0 24 24" style="color:#534AB7;vertical-align:middle"><path fill="currentColor" d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg> 预计房间数：<strong id="total-rooms">1</strong>间
+    </div>
+  </div>
+
+  <!-- 合作酒店 -->
+  <div class="section" style="background:#FFF8E6;border-radius:10px;padding:12px 14px;margin-top:4px">
+    <div class="section-title" style="border-bottom:none;margin-bottom:8px"><span class="s-icon">&#11088;</span> 协议酒店（优先推荐）</div>
+    <div style="font-size:12px;color:#444;line-height:1.8">
+      <div style="margin-bottom:8px">
+        <strong style="color:#BA7517">&#127969; 桔子酒店（青年路店）</strong><br>
+        <span style="color:#666">江汉区青年路556号房开大厦</span><br>
+        <span style="color:#534AB7">协议价 &#165;298/间（含双早）</span>
+      </div>
+      <div>
+        <strong style="color:#BA7517">&#127969; 武汉明珠豪生大酒店</strong><br>
+        <span style="color:#666">江岸区沿江大道182号</span><br>
+        <span style="color:#534AB7">城景大床房 &#165;550（双早）| 高级江景大床房 &#165;600 | 商务江景大床房 &#165;680（单早）</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 接机接站 -->
+  <div class="section" style="background:#FFF5F5;border-radius:10px;padding:12px 14px;margin-top:4px">
+    <div class="section-title" style="border-bottom:none;margin-bottom:8px"><span class="s-icon" style="color:#A32D2D">&#9992;</span> 接机 / 接站</div>
+    <div style="font-size:12px;color:#444;line-height:1.8">
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">交通工具</div>
+        <div class="chip-group">
+          <span class="chip" data-g="transport" data-v="plane" onclick="toggleChip(this)"><span class="chip-dot" style="background:#185FA5"></span>飞机（接机）</span>
+          <span class="chip" data-g="transport" data-v="train" onclick="toggleChip(this)"><span class="chip-dot" style="background:#534AB7"></span>火车（接站）</span>
+        </div>
+      </div>
+      <div id="transport-detail" style="margin-top:8px;display:none">
+        <div style="font-size:11px;color:#888;margin-bottom:4px">站点选择</div>
+        <div id="station-list" class="chip-group"></div>
+      </div>
+      <div id="pickup-time-row" style="margin-top:8px;display:none">
+        <div id="plane-time-row" style="margin-bottom:6px;display:none">
+          <label style="font-size:11px;color:#185FA5;display:block;margin-bottom:2px">&#9992; 接机时间</label>
+          <input type="time" id="plane-time" style="width:100%;padding:6px 10px;border:0.5px solid #185FA5;border-radius:8px;font-size:13px;font-family:inherit">
+        </div>
+        <div id="train-time-row" style="display:none">
+          <label style="font-size:11px;color:#534AB7;display:block;margin-bottom:2px">&#128646; 接站时间</label>
+          <input type="time" id="train-time" style="width:100%;padding:6px 10px;border:0.5px solid #534AB7;border-radius:8px;font-size:13px;font-family:inherit">
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <label style="font-size:12px;color:#555;display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="bring-gift" style="width:16px;height:16px">
+          携带礼物（伴手礼）
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#127757;</span> 客户来源</div>
+    <div class="chip-group" id="origin-group">
+      <span class="chip" data-g="origin" data-v="mainland" onclick="toggleChip(this)"><span class="chip-dot" style="background:#534AB7"></span>中国大陆</span>
+      <span class="chip" data-g="origin" data-v="hk_tw" onclick="toggleChip(this)"><span class="chip-dot" style="background:#185FA5"></span>港澳台</span>
+      <span class="chip" data-g="origin" data-v="usa" onclick="toggleChip(this)"><span class="chip-dot" style="background:#185FA5"></span>美国</span>
+      <span class="chip" data-g="origin" data-v="europe" onclick="toggleChip(this)"><span class="chip-dot" style="background:#0F6E56"></span>欧洲</span>
+      <span class="chip" data-g="origin" data-v="mideast" onclick="toggleChip(this)"><span class="chip-dot" style="background:#BA7517"></span>中东</span>
+      <span class="chip" data-g="origin" data-v="sea" onclick="toggleChip(this)"><span class="chip-dot" style="background:#639922"></span>东南亚</span>
+      <span class="chip" data-g="origin" data-v="africa" onclick="toggleChip(this)"><span class="chip-dot" style="background:#993C1D"></span>非洲</span>
+      <span class="chip" data-g="origin" data-v="russia" onclick="toggleChip(this)"><span class="chip-dot" style="background:#A32D2D"></span>俄罗斯</span>
+    </div>
+    <div class="select-hint">可多选，影响语言安排与礼仪风格</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#128332;</span> 民族 / 宗教禁忌</div>
+    <div class="chip-group">
+      <span class="chip warn" data-g="religion" data-v="none" onclick="toggleReligionChip(this)">&#10004; 无禁忌</span>
+      <span class="chip warn" data-g="religion" data-v="muslim" onclick="toggleReligionChip(this)">&#9844; 穆斯林</span>
+      <span class="chip warn" data-g="religion" data-v="islam" onclick="toggleReligionChip(this)">&#9775; 伊斯兰教（清真）</span>
+      <span class="chip warn" data-g="religion" data-v="jewish" onclick="toggleReligionChip(this)">&#10017; 犹太教（洁食）</span>
+      <span class="chip warn" data-g="religion" data-v="hindu" onclick="toggleReligionChip(this)">&#128720; 印度教（素食）</span>
+      <span class="chip warn" data-g="religion" data-v="buddhist" onclick="toggleReligionChip(this)">&#9784; 佛教（素食）</span>
+      <span class="chip warn" data-g="religion" data-v="christian" onclick="toggleReligionChip(this)">&#10013; 基督教</span>
+      <span class="chip danger" data-g="religion" data-v="no_pork" onclick="toggleReligionChip(this)">&#10060; 禁猪肉</span>
+      <span class="chip danger" data-g="religion" data-v="no_beef" onclick="toggleReligionChip(this)">&#10060; 禁牛肉</span>
+      <span class="chip danger" data-g="religion" data-v="no_alcohol" onclick="toggleReligionChip(this)">&#10060; 禁酒精</span>
+      <span class="chip danger" data-g="religion" data-v="vegan" onclick="toggleReligionChip(this)">&#127807; 纯素食</span>
+      <span class="chip danger" data-g="religion" data-v="no_seafood" onclick="toggleReligionChip(this)">&#10060; 禁海鲜</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#127834;</span> 饮食偏好</div>
+    <div class="chip-group">
+      <span class="chip" data-g="food" data-v="local" onclick="toggleChip(this)">&#127862; 偏好本地菜</span>
+      <span class="chip" data-g="food" data-v="western" onclick="toggleChip(this)">&#129369; 西餐为主</span>
+      <span class="chip" data-g="food" data-v="light" onclick="toggleChip(this)">&#127815; 清淡健康</span>
+      <span class="chip" data-g="food" data-v="spicy" onclick="toggleChip(this)">&#128293; 接受辛辣</span>
+      <span class="chip" data-g="food" data-v="seafood" onclick="toggleChip(this)">&#129424; 喜好海鲜</span>
+      <span class="chip" data-g="food" data-v="fine" onclick="toggleChip(this)">&#127857; 高端精致</span>
+      <span class="chip" data-g="food" data-v="buffet" onclick="toggleChip(this)">&#127837; 自助形式</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#127919;</span> 活动偏好</div>
+    <div class="chip-group">
+      <span class="chip" data-g="activity" data-v="hq_visit" onclick="toggleChip(this)">&#127970; 公司总部参观（茶歇）</span>
+      <span class="chip" data-g="activity" data-v="factory_visit" onclick="toggleChip(this)">&#127981; 工厂实地考察</span>
+      <span class="chip" data-g="activity" data-v="culture" onclick="toggleChip(this)">&#127963; 历史文化</span>
+      <span class="chip" data-g="activity" data-v="nature" onclick="toggleChip(this)">&#127807; 自然风光</span>
+      <span class="chip" data-g="activity" data-v="sports" onclick="toggleChip(this)">&#9971; 运动休闲</span>
+      <span class="chip" data-g="activity" data-v="art" onclick="toggleChip(this)">&#127917; 演出艺术</span>
+      <span class="chip" data-g="activity" data-v="shopping" onclick="toggleChip(this)">&#128722; 购物体验</span>
+      <span class="chip" data-g="activity" data-v="nightlife" onclick="toggleChip(this)">&#127747; 夜游武汉</span>
+    </div>
+  </div>
+
+  <!-- 公司信息 -->
+  <div class="section" style="background:#F8F7FE;border-radius:10px;padding:12px 14px;margin-top:4px">
+    <div class="section-title" style="border-bottom:none;margin-bottom:8px"><span class="s-icon">&#127970;</span> 公司地址</div>
+    <div style="font-size:12px;color:#444;line-height:2">
+      <div>&#128205; <strong>总部</strong>：武汉市江汉区金贸大厦D座</div>
+      <div>&#127981; <strong>工厂</strong>：新洲区邾城街骆畈村胡梓木湾151号</div>
+    </div>
+    <div style="font-size:11px;color:#999;margin-top:6px;line-height:1.6">总部参观含商务茶歇接待 · 工厂考察需提前协调生产线</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#128197;</span> 接待日期</div>
+    <div class="date-row">
+      <input type="date" id="date-input">
+      <label style="font-size:12px;color:#888">选择后自动匹配时令美食与交通提醒</label>
+    </div>
+    <div id="date-tip-area"></div>
+  </div>
+
+  <!-- 需求5: 接待天数提示 -->
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#128197;</span> 接待天数</div>
+    <div class="days-row">
+      <input type="number" id="days-input" value="2" min="1" max="7">
+      <label>天（1-7天）</label>
+    </div>
+    <div class="days-tip">接待天数从接机/接站当天起算（含当天）</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#128176;</span> 预算级别</div>
+    <div class="chip-group">
+      <span class="chip" data-g="budget" data-v="economy" onclick="selectRadio(this,'budget')">&#128176; 3千以内</span>
+      <span class="chip" data-g="budget" data-v="standard" onclick="selectRadio(this,'budget')">&#128181; 3千-1万</span>
+      <span class="chip" data-g="budget" data-v="premium" onclick="selectRadio(this,'budget')">&#128184; 1-2万</span>
+      <span class="chip" data-g="budget" data-v="luxury" onclick="selectRadio(this,'budget')">&#128142; 2万以上</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="s-icon">&#128203;</span> 特殊要求</div>
+    <div class="chip-group">
+      <span class="chip" data-g="special" data-v="interpeter" onclick="toggleChip(this)">&#128220; 需要翻译</span>
+      <span class="chip" data-g="special" data-v="wheelchair" onclick="toggleChip(this)">&#9855; 无障碍需求</span>
+      <span class="chip" data-g="special" data-v="kids" onclick="toggleChip(this)">&#128118; 携带儿童</span>
+      <span class="chip" data-g="special" data-v="elderly" onclick="toggleChip(this)">&#128100; 老人同行</span>
+      <span class="chip" data-g="special" data-v="photo" onclick="toggleChip(this)">&#128247; 摄影留念</span>
+      <span class="chip" data-g="special" data-v="gift" onclick="toggleChip(this)">&#127873; 准备礼品</span>
+      <span class="chip" data-g="special" data-v="security" onclick="toggleChip(this)">&#128274; 安保随行</span>
+    </div>
+  </div>
+  <div style="padding-top:4px">
+    <button class="gen-btn" id="gen-btn" disabled onclick="generatePlans()">&#10024; 生成3套接待方案</button>
+    <button class="reset-btn" onclick="resetAll()">重置所有选项</button>
+  </div>
+</div>
+
+<div class="main" id="main-area">
+  <div class="empty-state" id="empty-state">
+    <div class="empty-icon">&#128218;</div>
+    <div class="empty-text">请在左侧配置客户信息</div>
+    <div class="empty-sub">选择酒店预定等级、来源及各项偏好后，点击「生成方案」</div>
+  </div>
+</div>
+
+</div>
+<script>
+// ========== 数据加载部分 ==========
+var WUHAN_DATA = null;
+var WUHAN_STATIONS = null;
+var WUHAN_ZONES = null;
+var WUHAN_VENUES = null;
+var LEVEL_META = null;
+var ORIGIN_NAMES = null;
+var SEASONAL_FOOD = null;
+var WUHAN_EVENTS = null;
+
+fetch('./wuhan_data.json')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    WUHAN_STATIONS = data.stations;
+    WUHAN_ZONES = data.zones;
+    WUHAN_VENUES = data.venues;
+    LEVEL_META = data.level_meta;
+    ORIGIN_NAMES = data.origin_names;
+    SEASONAL_FOOD = data.seasonal_food;
+    WUHAN_EVENTS = data.wuhan_events;
+    WUHAN_DATA = data;
+    
+    // 显示数据版本
+    document.getElementById('data-version').textContent = '数据更新：' + data.last_update;
+    
+    // 数据加载完成后启用生成按钮
+    document.getElementById('gen-btn').disabled = false;
+  })
+  .catch(function(e) {
+    console.error('数据加载失败:', e);
+    document.getElementById('main-area').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">数据加载失败，请刷新重试</div></div>';
+  });
+// ========== 数据加载部分结束 ==========
+
+var state = { level: null, budget: null };
+
+function selectLevel(val, el) {
+  var cards = document.querySelectorAll('.level-card');
+  for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('active'); }
+  el.classList.add('active');
+  state.level = val;
+}
+
+function selectRadio(el, group) {
+  var chips = document.querySelectorAll('.chip[data-g="' + group + '"]');
+  for (var i = 0; i < chips.length; i++) { chips[i].classList.remove('active'); }
+  el.classList.add('active');
+  state[group] = el.dataset.v;
+}
+
+function toggleReligionChip(el) {
+  var group = 'religion';
+  var chips = document.querySelectorAll('.chip[data-g="' + group + '"]');
+  if (el.dataset.v === 'none') {
+    // 选"无禁忌"→清除所有其他
+    var wasActive = el.classList.contains('active');
+    for (var i = 0; i < chips.length; i++) { chips[i].classList.remove('active'); }
+    if (!wasActive) el.classList.add('active');
+  } else {
+    // 选其他禁忌→清除"无禁忌"
+    var noneChip = document.querySelector('.chip[data-g="religion"][data-v="none"]');
+    if (noneChip) noneChip.classList.remove('active');
+    el.classList.toggle('active');
+  }
+}
+
+function toggleChip(el) {
+  el.classList.toggle('active');
+  var group = el.dataset.g;
+  if (group === 'transport') {
+    updateTransportDetail();
+    togglePickupTime();
+  }
+}
+
+function updateTransportDetail() {
+  var detailDiv = document.getElementById('transport-detail');
+  var stationList = document.getElementById('station-list');
+  var active = getActive('transport');
+  if (active.length > 0) {
+    detailDiv.style.display = 'block';
+    var html = '';
+    if (active.includes('plane')) {
+      html += '<span class="chip active" style="border-color:#185FA5;background:#E6F1FB;color:#185FA5"><span class="chip-dot" style="background:#185FA5"></span>武汉天河国际机场</span>';
+    }
+    if (active.includes('train')) {
+      WUHAN_STATIONS.stations.forEach(function(s) {
+        html += '<span class="chip" data-g="station" data-v="' + s.name + '" onclick="toggleChip(this)"><span class="chip-dot" style="background:#534AB7"></span>' + s.name + '</span>';
+      });
+    }
+    stationList.innerHTML = html;
+  } else {
+    detailDiv.style.display = 'none';
+  }
+}
+
+function togglePickupTime() {
+  var timeRow = document.getElementById('pickup-time-row');
+  var planeTimeRow = document.getElementById('plane-time-row');
+  var trainTimeRow = document.getElementById('train-time-row');
+  var transports = getActive('transport');
+  
+  // 选中了任何交通工具就显示时间区域，否则隐藏
+  timeRow.style.display = transports.length > 0 ? 'block' : 'none';
+  
+  // 根据选择显示/隐藏对应时间输入框
+  planeTimeRow.style.display = transports.includes('plane') ? 'block' : 'none';
+  trainTimeRow.style.display = transports.includes('train') ? 'block' : 'none';
+}
+
+function getActive(group) {
+  var chips = document.querySelectorAll('.chip[data-g="' + group + '"].active');
+  var result = [];
+  for (var i = 0; i < chips.length; i++) { result.push(chips[i].dataset.v); }
+  return result;
+}
+
+function resetAll() {
+  var chips = document.querySelectorAll('.chip');
+  for (var i = 0; i < chips.length; i++) { chips[i].classList.remove('active'); }
+  var cards = document.querySelectorAll('.level-card');
+  for (var j = 0; j < cards.length; j++) { cards[j].classList.remove('active'); }
+  state.level = null;
+  state.budget = null;
+  document.getElementById('days-input').value = 2;
+  document.getElementById('guest-count').value = 1;
+  document.getElementById('room-type').value = 'double';
+  document.getElementById('share-room').checked = false;
+  // 重置接机接站
+  document.getElementById('bring-gift').checked = false;
+  document.getElementById('plane-time').value = '';
+  document.getElementById('train-time').value = '';
+  document.getElementById('pickup-time-row').style.display = 'none';
+  document.getElementById('plane-time-row').style.display = 'none';
+  document.getElementById('train-time-row').style.display = 'none';
+  updateRoomCalc();
+  document.getElementById('main-area').innerHTML =
+    '<div class="empty-state" id="empty-state">' +
+    '<div class="empty-icon">&#128218;</div>' +
+    '<div class="empty-text">请在左侧配置客户信息</div>' +
+    '<div class="empty-sub">选择酒店预定等级、来源及各项偏好后，点击「生成方案」</div></div>';
+}
+
+function getBudgetLabel(b) {
+  var labels = { economy:'3千以内', standard:'3千-1万', premium:'1-2万', luxury:'2万以上' };
+  return labels[b] || '3千-1万';
+}
+
+/* ===== 房间数量自动计算 ===== */
+function updateRoomCalc() {
+  var guests = parseInt(document.getElementById('guest-count').value) || 1;
+  var roomType = document.getElementById('room-type').value;
+  var canShare = document.getElementById('share-room').checked;
+  
+  // 更新显示
+  document.getElementById('total-guests').textContent = guests;
+  
+  // 计算房间数
+  var rooms = 1;
+  if (roomType === 'suite') {
+    // 套房默认1-2人
+    rooms = Math.ceil(guests / 2);
+  } else if (roomType === 'twin') {
+    // 双床房每间2人
+    rooms = Math.ceil(guests / 2);
+  } else if (roomType === 'double') {
+    // 大床房可合住时2人，否则1人
+    rooms = canShare ? Math.ceil(guests / 2) : guests;
+  } else {
+    // 单人间每间1人
+    rooms = guests;
+  }
+  
+  document.getElementById('total-rooms').textContent = rooms;
+}
+
+/* ===== 房间数量计算 end ===== */
+
+/* ===== 需求1: 优化checkBudgetConflict函数 =====
+ * 计算公式：房间数 × 每间夜价格 × 天数 = 总住宿费用
+ * 与预算上限对比，超出则弹窗提示具体金额冲突
+ */
+function checkBudgetConflict(level, rooms, days, budget) {
+  var partner = WUHAN_VENUES.partner_hotels;
+  var costPerRoom = 0;
+  
+  // 计算该等级的每间夜费用
+  if (level === 'economy' || level === 'important') {
+    costPerRoom = partner.juzi.price; // 298
+  } else if (level === 'vip') {
+    costPerRoom = 600; // 使用明珠豪生平均值
+  } else if (level === 'vvip') {
+    costPerRoom = 680; // 最高档
+  }
+  
+  // 需求1: 准确计算总住宿费用
+  var hotelCostPerDay = costPerRoom * rooms;
+  var totalHotelCost = hotelCostPerDay * days; // 房间数 × 每间夜价格 × 天数
+  
+  // 预算上限（总预算，不是人均）
+  var budgetLimit = {
+    economy: 3000,
+    standard: 10000,
+    premium: 20000,
+    luxury: 50000
+  };
+  
+  var limit = budgetLimit[budget] || budgetLimit.standard;
+  
+  // 如果住宿费用超过预算上限，则提示冲突
+  if (totalHotelCost > limit) {
+    var budgetLabel = budget === 'economy' ? '3千以内' : budget === 'standard' ? '3千-1万' : budget === 'premium' ? '1-2万' : '2万以上';
+    return {
+      conflict: true,
+      hotelCost: totalHotelCost,
+      budgetLimit: limit,
+      message: '【预算冲突提示】\n\n' +
+               '当前酒店预定等级：' + LEVEL_META[level].name + '\n' +
+               '住宿费用计算：' + costPerRoom + '元/间 × ' + rooms + '间 × ' + days + '晚 = ' + '¥' + totalHotelCost + '\n' +
+               '您的预算范围：' + budgetLabel + '（上限 ¥' + limit + '）\n' +
+               '超出金额：¥' + (totalHotelCost - limit) + '\n\n' +
+               '建议调整：\n' +
+               '• 降低酒店等级（如VVIP→VIP，或改用协议酒店）\n' +
+               '• 提高预算标准\n' +
+               '• 减少住宿天数'
+    };
+  }
+  
+  return { conflict: false };
+}
+
+/* ===== 检查是否已选择酒店预定等级 ===== */
+function checkLevelSelected() {
+  if (!state.level) {
+    alert('请先选择「酒店预定等级」！\n\n可在页面左侧"酒店预定等级"区域选择：\n• 普通客户（¥300-500/间）\n• 重要客户（¥500-800/间）\n• VIP客户（¥800-1200/间）\n• VVIP客户（¥1200+/间）');
+    return false;
+  }
+  return true;
+}
+
+/* ===== 需求3: 根据酒店预定等级匹配不同档次的酒店 ===== */
+/* 问题6修复：确保pickHotelWithLevel被正确调用，协议酒店优先 */
+function pickHotelWithLevel(level) {
+  var partner = WUHAN_VENUES.partner_hotels;
+  var hotels = WUHAN_VENUES.hotel;
+  
+  // 问题6修复：统一使用协议酒店，名称明确标注"协议酒店"
+  // economy/important → 桔子酒店（青年路店）协议价 ¥298
+  // vip → 武汉明珠豪生大酒店
+  // vvip → 武汉明珠豪生大酒店（商务江景大床房）
+  
+  if (level === 'economy' || level === 'important') {
+    return {
+      name: partner.juzi.name,
+      address: partner.juzi.address,
+      price: partner.juzi.price,
+      breakfast: partner.juzi.breakfast,
+      isPartner: true,
+      desc: '协议酒店',
+      zone: partner.juzi.zone
+    };
+  }
+  
+  if (level === 'vip') {
+    var roomIdx = Math.floor(Math.random() * partner.mingzhu.length);
+    var selected = partner.mingzhu[roomIdx];
+    return {
+      name: '武汉明珠豪生大酒店',
+      room: selected.room,
+      address: '江岸区沿江大道182号',
+      price: selected.price,
+      breakfast: selected.breakfast,
+      isPartner: true,
+      desc: '协议酒店',
+      zone: 'hankou'
+    };
+  }
+  
+  if (level === 'vvip') {
+    // VVIP固定使用商务江景大床房
+    var selectedVVIP = partner.mingzhu[2] || partner.mingzhu[1];
+    return {
+      name: '武汉明珠豪生大酒店',
+      room: selectedVVIP.room,
+      address: '江岸区沿江大道182号',
+      price: selectedVVIP.price,
+      breakfast: selectedVVIP.breakfast,
+      isPartner: true,
+      desc: '协议酒店',
+      zone: 'hankou'
+    };
+  }
+  
+  // 默认返回协议酒店
+  return {
+    name: partner.juzi.name,
+    address: partner.juzi.address,
+    price: partner.juzi.price,
+    breakfast: partner.juzi.breakfast,
+    isPartner: true,
+    desc: '协议酒店',
+    zone: partner.juzi.zone
+  };
+}
+
+function pickHotel(budget, level) {
+  return pickHotelWithLevel(level);
+}
+
+/* 问题1修复：pickRestaurant需要排除已用餐厅
+ * 问题4修复：餐厅按区域选择，减少跨区移动
+ */
+function pickRestaurant(religions, foods, usedRestaurants, preferredZone) {
+  var allRestaurants = [];
+  var pool = [];
+  
+  // 构建可用餐厅池
+  if (religions.indexOf('none') >= 0) {
+    // 无禁忌：直接按饮食偏好选餐厅，跳过宗教过滤
+    if (foods.indexOf('western') >= 0) pool = WUHAN_VENUES.restaurant.western;
+    else if (foods.indexOf('fine') >= 0 || foods.indexOf('local') >= 0) pool = WUHAN_VENUES.restaurant.local_luxury;
+    else pool = WUHAN_VENUES.restaurant.local_normal;
+  }
+  if (religions.indexOf('islam') >= 0 || religions.indexOf('no_pork') >= 0 || religions.indexOf('muslim') >= 0) pool = WUHAN_VENUES.restaurant.halal;
+  if (religions.indexOf('vegan') >= 0 || religions.indexOf('hindu') >= 0 || religions.indexOf('buddhist') >= 0) pool = WUHAN_VENUES.restaurant.veg;
+  if (pool.length === 0) {
+    if (foods.indexOf('western') >= 0) pool = WUHAN_VENUES.restaurant.western;
+    else if (foods.indexOf('fine') >= 0 || foods.indexOf('local') >= 0) pool = WUHAN_VENUES.restaurant.local_luxury;
+    else pool = WUHAN_VENUES.restaurant.local_normal;
+  }
+  
+  // 过滤掉已使用的餐厅
+  allRestaurants = pool.filter(function(r) {
+    return usedRestaurants.indexOf(r.name) === -1;
+  });
+  
+  // 如果过滤后没有可用餐厅，回退到使用所有池内餐厅
+  if (allRestaurants.length === 0) {
+    allRestaurants = pool;
+  }
+  
+  // 问题4修复：优先选择同区域的餐厅
+  if (preferredZone) {
+    var sameZone = allRestaurants.filter(function(r) { return r.zone === preferredZone; });
+    if (sameZone.length > 0) {
+      allRestaurants = sameZone;
+    }
+  }
+  
+  if (allRestaurants.length === 0) return pool[Math.floor(Math.random() * pool.length)].name;
+  return allRestaurants[Math.floor(Math.random() * allRestaurants.length)].name;
+}
+
+function pickRand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* 问题2和问题4修复：pickSights增强
+ * 1. 同一天同类景点最多1个
+ * 2. 不同天之间也要避免重复景点
+ * 3. 按区域分组安排
+ */
+function pickSights(activities, usedSights, dayZone) {
+  var pool = [];
+  var poolMap = {}; // 用于去重同类景点
+  
+  // 构建景点池（带类型和区域信息）
+  if (activities.indexOf('culture') >= 0 || activities.length === 0) {
+    WUHAN_VENUES.sight.culture.forEach(function(s) {
+      if (usedSights.indexOf(s.name) === -1) {
+        pool.push(s);
+      }
+    });
+  }
+  if (activities.indexOf('nature') >= 0) {
+    WUHAN_VENUES.sight.nature.forEach(function(s) {
+      if (usedSights.indexOf(s.name) === -1) {
+        pool.push(s);
+      }
+    });
+  }
+  if (activities.indexOf('business') >= 0 || activities.indexOf('tech') >= 0) {
+    WUHAN_VENUES.sight.business.forEach(function(s) {
+      if (usedSights.indexOf(s.name) === -1) {
+        pool.push(s);
+      }
+    });
+  }
+  if (activities.indexOf('nightlife') >= 0) {
+    WUHAN_VENUES.sight.night.forEach(function(s) {
+      if (usedSights.indexOf(s.name) === -1) {
+        pool.push(s);
+      }
+    });
+  }
+  if (activities.indexOf('hq_visit') >= 0) {
+    pool.push(WUHAN_VENUES.company.hq);
+    pool.push(WUHAN_VENUES.company.tea);
+  }
+  if (activities.indexOf('factory_visit') >= 0) {
+    pool.push(WUHAN_VENUES.company.factory);
+  }
+  
+  // 如果池为空，补充一些默认景点
+  if (pool.length === 0) {
+    var defaultCulture = WUHAN_VENUES.sight.culture.filter(function(s) { return usedSights.indexOf(s.name) === -1; });
+    var defaultModern = WUHAN_VENUES.sight.modern.filter(function(s) { return usedSights.indexOf(s.name) === -1; });
+    pool = defaultCulture.concat(defaultModern);
+  }
+  
+  // 问题2修复：同类景点只选1个，避免同一天多个寺庙
+  var typeSelected = {};
+  var result = [];
+  var shuffled = pool.slice().sort(function(){ return Math.random() - 0.5; });
+  
+  for (var i = 0; i < shuffled.length && result.length < 4; i++) {
+    var sight = shuffled[i];
+    // 如果是景点（不是公司活动），检查同类
+    if (sight.type) {
+      if (typeSelected[sight.type]) continue; // 同类型已选过
+      typeSelected[sight.type] = true;
+    }
+    result.push(sight);
+  }
+  
+  return result;
+}
+
+/* 问题4修复：获取行程主区域 */
+function getMainZone(activities, dayIdx) {
+  // 如果有工厂考察，单独安排半天去新洲
+  if (activities.indexOf('factory_visit') >= 0 && dayIdx > 0) {
+    return 'xinzhou';
+  }
+  // 如果有总部参观，安排在汉口片区
+  if (activities.indexOf('hq_visit') >= 0 && dayIdx === 0) {
+    return 'hankou';
+  }
+  // 默认返回汉口片区（公司所在地）
+  return 'hankou';
+}
+
+/* ===== 需求5: 行程从接机/接站开始，智能排餐 =====
+ * 根据接机/接站时间智能安排当天餐食
+ */
+function getMealPlanByArrivalTime(arrivalHour) {
+  // 根据到达时间安排餐食
+  if (arrivalHour < 8) {
+    // 8:00前到达：安排早餐+午餐+晚餐
+    return { breakfast: true, lunch: true, dinner: true, snack: false, desc: '全餐安排' };
+  } else if (arrivalHour >= 8 && arrivalHour <= 11) {
+    // 8:00-11:00到达：安排午餐+晚餐
+    return { breakfast: false, lunch: true, dinner: true, snack: false, desc: '午餐+晚餐' };
+  } else if (arrivalHour > 11 && arrivalHour <= 14) {
+    // 11:00-14:00到达：安排午餐（延后）+晚餐
+    return { breakfast: false, lunch: true, lunchDelayed: true, dinner: true, snack: false, desc: '午餐（延后）+晚餐' };
+  } else if (arrivalHour > 14 && arrivalHour <= 17) {
+    // 14:00-17:00到达：安排晚餐
+    return { breakfast: false, lunch: false, dinner: true, snack: false, desc: '仅晚餐' };
+  } else {
+    // 17:00后到达：安排简餐/宵夜
+    return { breakfast: false, lunch: false, dinner: false, snack: true, desc: '简餐/宵夜' };
+  }
+}
+
+/* 问题4修复：buildDaySchedule增强，传入已用餐厅和景点
+ * 问题5修复：将"闭馆专享"改为真实存在的服务
+ */
+function buildDaySchedule(level, religions, foods, activities, budget, dayIdx, style, pickupInfo, pickupTime, hasPickup, usedRestaurants, usedSights, guests, rooms) {
+  var hotel = pickHotel(budget, level);
+  var hotelName = hotel.isPartner ? hotel.name + '（' + hotel.desc + '）' : hotel.name;
+  var mainZone = getMainZone(activities, dayIdx);
+  
+  // 餐厅选择 - 问题1修复：传入已用餐厅列表
+  var restaurant1 = pickRestaurant(religions, foods, usedRestaurants, mainZone);
+  var newUsedRestaurants = usedRestaurants.concat([restaurant1]);
+  var restaurant2 = pickRestaurant(religions, foods, newUsedRestaurants, mainZone);
+  newUsedRestaurants.push(restaurant2);
+  
+  // 景点选择 - 问题2修复：传入已用景点列表
+  var sights = pickSights(activities, usedSights, mainZone);
+  var isVVIP = level === 'vvip';
+  var hasHQ = activities.indexOf('hq_visit') >= 0;
+  var hasFactory = activities.indexOf('factory_visit') >= 0;
+  
+  // 接机接站处理
+  var pickupItem = null;
+  if (pickupInfo && dayIdx === 0) {
+    var pickupNote = pickupInfo;
+    if (style === 'deep') pickupNote += ' · 豪华专车接送';
+    else if (style === 'formal') pickupNote += ' · 商务车队';
+    else pickupNote += ' · 舒适商务车';
+    pickupItem = { time: pickupTime || '待定', name:'接机/接站', note:pickupNote, cat:'transport' };
+  }
+  
+  // 需求5: 根据到达时间智能安排餐食
+  var mealPlan = { breakfast: false, lunch: true, dinner: true, snack: false };
+  var arrivalHour = 8; // 默认早上到达
+  if (pickupTime && pickupTime !== '待定' && dayIdx === 0 && hasPickup) {
+    var timeParts = pickupTime.split(':');
+    arrivalHour = parseInt(timeParts[0]) || 8;
+    mealPlan = getMealPlanByArrivalTime(arrivalHour);
+  }
+  
+  // 问题5修复：真实存在的VIP服务描述
+  var vipServiceNote = '专业讲解员全程陪同 · VIP优先通道';
+  var deepVipServiceNote = '资深讲解员专属服务 · 无线耳麦设备';
+  
+  // ========== 第1天（到达日）行程 ==========
+  if (dayIdx === 0) {
+    var day1Schedule = [];
+    
+    // 如果有接机，从接机开始
+    if (pickupItem) {
+      day1Schedule.push(pickupItem);
+    }
+    
+    // 根据到达时间安排餐食和活动
+    if (mealPlan.snack) {
+      // 晚到达：简餐/宵夜
+      day1Schedule.push({ time: '20:00', name:'简餐/宵夜', note:'安排简餐或酒店附近小吃', cat:'food' });
+      day1Schedule.push({ time: '22:00', name:'送至酒店入住休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' });
+      day1Schedule.push({ time: '23:00', name:'就寝休息', note:'尊享舒适睡眠环境 · 养精蓄锐', cat:'hotel' });
+    } else if (mealPlan.dinner && !mealPlan.lunch && !mealPlan.breakfast) {
+      // 14:00-17:00到达：仅晚餐
+      if (pickupItem) {
+        day1Schedule.push({ time: '17:30', name:'欢迎晚宴', note:restaurant1 + '（包厢）', cat:'food' });
+        day1Schedule.push({ time: '20:00', name:'送至酒店入住休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' });
+        day1Schedule.push({ time: '22:00', name:'就寝休息', note:'尊享舒适睡眠环境 · 养精蓄锐', cat:'hotel' });
+      }
+    } else if (mealPlan.dinner && mealPlan.lunch && !mealPlan.breakfast) {
+      // 8:00-14:00到达：午餐+晚餐
+      var lunchTime = mealPlan.lunchDelayed ? '13:00' : '12:00';
+      if (pickupItem) {
+        day1Schedule.push({ time: lunchTime, name:'商务午宴', note:restaurant1 + '（包厢）', cat:'food' });
+        if (hasHQ) {
+          day1Schedule.push({ time: '14:30', name:'公司总部参观', note:'江汉区金贸大厦D座 · 企业展厅+文化墙', cat:'business' });
+          day1Schedule.push({ time: '16:00', name:'商务茶歇', note:'总部会议室 · 精致茶点', cat:'food' });
+        }
+        day1Schedule.push({ time: '18:30', name:'欢迎晚宴', note:restaurant2 + '（' + (isVVIP ? '总统套餐' : '行政套餐') + '）', cat:'food' });
+        day1Schedule.push({ time: '21:00', name:'送至酒店入住休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' });
+        day1Schedule.push({ time: '22:30', name:'就寝休息', note:'尊享舒适睡眠环境 · 养精蓄锐', cat:'hotel' });
+      }
+    } else if (mealPlan.breakfast && mealPlan.lunch && mealPlan.dinner) {
+      // 8:00前到达：全餐
+      if (pickupItem) {
+        day1Schedule.push({ time: '08:00', name:'特色早餐', note:'品尝武汉过早文化 · 热干面+蛋酒', cat:'food' });
+        var sight1Name = typeof sights[0] === 'object' ? sights[0].name : (sights[0] || '黄鹤楼');
+        day1Schedule.push({ time: '09:30', name: hasHQ ? '公司总部参观' : sight1Name, note: hasHQ ? '江汉区金贸大厦D座 · 企业展厅' : vipServiceNote, cat: hasHQ ? 'business' : 'sight' });
+        day1Schedule.push({ time: '12:00', name:'商务午宴', note:restaurant1 + '（包厢）', cat:'food' });
+        var sight2Name = typeof sights[1] === 'object' ? sights[1].name : (sights[1] || '湖北省博物馆');
+        day1Schedule.push({ time: '14:00', name: hasFactory ? '工厂实地考察' : sight2Name, note: hasFactory ? '新洲区邾城街骆畈村 · 生产线参观' : vipServiceNote, cat: hasFactory ? 'business' : 'sight' });
+        day1Schedule.push({ time: '18:00', name:'欢迎晚宴', note:restaurant2 + '（' + (isVVIP ? '总统套餐' : '行政套餐') + '）', cat:'food' });
+        day1Schedule.push({ time: '21:00', name:'送至酒店入住休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' });
+        day1Schedule.push({ time: '22:30', name:'就寝休息', note:'尊享舒适睡眠环境 · 养精蓄锐', cat:'hotel' });
+      }
+    }
+    
+    // 如果没有接机，从酒店出发开始
+    if (!pickupItem && dayIdx === 0) {
+      var sight1Name = typeof sights[0] === 'object' ? sights[0].name : (sights[0] || '黄鹤楼');
+      var sight2Name = typeof sights[1] === 'object' ? sights[1].name : (sights[1] || '湖北省博物馆');
+      day1Schedule = [
+        { time: '08:30', name:'从酒店出发', note:hotelName + ' · 享用早餐', cat:'hotel' },
+        { time: '09:30', name: hasHQ ? '公司总部参观' : sight1Name, note: hasHQ ? '江汉区金贸大厦D座 · 企业展厅' : vipServiceNote, cat: hasHQ ? 'business' : 'sight' },
+        { time: '12:00', name:'商务午宴', note:restaurant1 + '（包厢）', cat:'food' },
+        { time: '14:00', name: hasFactory ? '工厂实地考察' : sight2Name, note: hasFactory ? '新洲区邾城街骆畈村 · 生产线参观' : vipServiceNote, cat: hasFactory ? 'business' : 'sight' },
+        { time: '18:00', name:'欢迎晚宴', note:restaurant2 + '（' + (isVVIP ? '总统套餐' : '行政套餐') + '）', cat:'food' },
+        { time: '21:00', name:'送回酒店休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' },
+        { time: '22:30', name:'就寝休息', note:'尊享舒适睡眠环境 · 养精蓄锐', cat:'hotel' }
+      ];
+    }
+    
+    return {
+      schedule: day1Schedule.filter(function(s){ return s.name !== ''; }).map(function(s){ return { time:s.time, name:s.name, note:s.note, cat:s.cat, day:dayIdx+1 }; }),
+      usedRestaurants: newUsedRestaurants,
+      usedSights: sights.map(function(s){ return typeof s === 'object' ? s.name : s; })
+    };
+  }
+  
+  // ========== 第2天及之后（完整一天）行程 ==========
+  // 问题5修复：使用真实存在的VIP服务
+  var sight0Name = typeof sights[0] === 'object' ? sights[0].name : (sights[0] || '黄鹤楼');
+  var sight1Name = typeof sights[1] === 'object' ? sights[1].name : (sights[1] || '湖北省博物馆');
+  var sight2Name = typeof sights[2] === 'object' ? sights[2].name : (sights[2] || '楚河汉街');
+  var sight3Name = typeof sights[3] === 'object' ? sights[3].name : (sights[3] || '昙华林');
+  
+  var formal = [
+    { time:'08:00', name:'酒店早餐', note:'享用精致早餐', cat:'food' },
+    { time:'09:00', name:sight0Name, note:vipServiceNote, cat:'sight' },
+    { time:'10:30', name: hasHQ ? '公司总部参观' : sight1Name, note: hasHQ ? '江汉区金贸大厦D座 · 企业展厅+文化墙 · 高管陪同' : vipServiceNote, cat: hasHQ ? 'business' : 'sight' },
+    { time:'11:30', name: hasHQ ? '商务茶歇' : '', note: hasHQ ? '总部会议室 · 精致茶点+企业宣传片 · 自由交流' : '', cat:'food' },
+    { time:'12:00', name:'商务午宴', note:restaurant1 + '（包厢）' + (isVVIP ? ' · 黑珍珠餐厅' : ''), cat:'food' },
+    { time:'14:30', name: hasFactory ? '工厂实地考察' : sight1Name, note: hasFactory ? '新洲区邾城街骆畈村 · 生产线参观+工艺讲解' : '自由参观', cat: hasFactory ? 'business' : 'sight' },
+    { time:'17:30', name: hasFactory ? '考察总结交流' : sight2Name, note: hasFactory ? '会议室座谈 · 产品问答+合作洽谈' : '自由参观购物', cat:'business' },
+    { time:'18:30', name:'欢送晚宴', note:restaurant2 + '（' + (isVVIP ? '总统套餐' : '行政套餐') + '）', cat:'food' },
+    { time:'21:00', name:'送至酒店休息', note:'商务车送至 ' + hotelName + ' · 办理入住', cat:'hotel' },
+    { time:'22:00', name:'就寝休息', note:'尊享舒适睡眠环境', cat:'hotel' }
+  ];
+  var relaxed = [
+    { time:'09:00', name:'早茶轻松交流', note:pickRand(WUHAN_VENUES.restaurant.local_luxury).name + ' · 品武汉早点', cat:'food' },
+    { time:'10:30', name: hasHQ ? '总部参观+茶歇' : sight2Name, note: hasHQ ? '江汉区金贸大厦D座 · 轻松参观企业环境' : '骑行/漫步，轻松氛围', cat: hasHQ ? 'business' : 'nature' },
+    { time:'13:00', name:'特色午餐', note:restaurant1 + ' · 推荐特色菜', cat:'food' },
+    { time:'14:30', name: hasFactory ? '工厂考察体验' : sight3Name, note: hasFactory ? '新洲区邾城街骆畈村 · 生产车间+工艺展示' : '自由拍照，感受人文气息', cat: hasFactory ? 'business' : 'sight' },
+    { time:'18:00', name:'滨江晚餐', note:restaurant2 + ' · 长江景观位', cat:'food' },
+    { time:'20:30', name:'夜游长江', note:'豪华游轮 · 一小时夜景游', cat:'night' },
+    { time:'22:00', name:'送至酒店休息', note:'舒适商务车送至 ' + hotelName, cat:'hotel' },
+    { time:'23:00', name:'就寝休息', note:'尊享舒适睡眠环境', cat:'hotel' }
+  ];
+  // 问题5修复：deep行程中的"闭馆专享"改为真实存在的VIP服务
+  var deep = [
+    { time:'07:30', name:'私人管家接待', note:'专属礼宾，全程1对1服务', cat:'transport' },
+    { time:'08:00', name:'酒店早餐', note:'行政酒廊精致早餐', cat:'food' },
+    { time:'09:00', name: hasHQ ? '总部专享参观' : sight0Name, note: hasHQ ? '江汉区金贸大厦D座 · 董事长/总经理亲自接待' : deepVipServiceNote, cat: hasHQ ? 'business' : 'sight' },
+    { time:'10:30', name: hasHQ ? 'VIP茶歇会谈' : sight1Name, note: hasHQ ? '行政会议室 · 定制茶歇+企业宣传片' : deepVipServiceNote, cat: hasHQ ? 'food' : 'sight' },
+    { time:'12:00', name:'顶级私厨宴请', note:restaurant1 + ' · 主厨定制菜单', cat:'food' },
+    { time:'14:00', name: hasFactory ? '工厂深度考察' : (activities.indexOf('business') >= 0 ? '园区深度参观+高管会谈' : sight1Name), note: hasFactory ? '新洲区邾城街骆畈村 · 厂长陪同 · 全产线参观' : '园区深度参观+高管会谈', cat:'business' },
+    { time:'16:30', name: hasFactory ? '合作洽谈签约' : (activities.indexOf('business') >= 0 ? '商务洽谈签约' : '高端休闲时光'), note: hasFactory ? '总部会议室 · 商务洽谈+签约仪式' : (isVVIP ? '私人SPA水疗 · 豪华健身房' : '精致SPA · 行政酒廊下午茶'), cat:'business' },
+    { time:'18:30', name:'高端晚宴', note:restaurant2 + ' · ' + (isVVIP ? '总统包间' : '贵宾包间'), cat:'food' },
+    { time:'21:00', name:'送至酒店休息', note:'豪华专车送至 ' + hotelName + ' · VIP专属通道办理入住', cat:'hotel' },
+    { time:'22:30', name:'就寝休息', note:'豪华套房 · 尊享一夜好眠', cat:'hotel' }
+  ];
+  var sched = { formal:formal, relaxed:relaxed, deep:deep }[style] || formal;
+  sched = sched.filter(function(s){ return s.name !== ''; });
+  var scheduleResult = sched.map(function(s){ return { time:s.time, name:s.name, note:s.note, cat:s.cat, day:dayIdx+1 }; });
+  
+  return {
+    schedule: scheduleResult,
+    usedRestaurants: newUsedRestaurants,
+    usedSights: sights.map(function(s){ return typeof s === 'object' ? s.name : s; })
+  };
+}
+
+var CAT_ICON = { transport:'&#128663;', sight:'&#127963;', food:'&#127834;', hotel:'&#127968;', night:'&#127747;', nature:'&#127807;', business:'&#128188;', relax:'&#9832;' };
+
+/* 问题3修复：费用按总人数、单项总费用展示 */
+var COST_DETAIL = {
+  economy: [
+    [{ icon:'&#127968;', label:'住宿', val:'¥200-400' },{ icon:'&#127834;', label:'餐饮', val:'¥150-300' },{ icon:'&#128663;', label:'交通/门票', val:'¥100-200' },{ icon:'&#127915;', label:'其他', val:'¥50-100' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥150-300' },{ icon:'&#127834;', label:'餐饮', val:'¥120-250' },{ icon:'&#128663;', label:'交通/门票', val:'¥80-150' },{ icon:'&#127915;', label:'其他', val:'¥50-100' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥600-1,000' },{ icon:'&#127834;', label:'餐饮', val:'¥500-900' },{ icon:'&#128663;', label:'交通/门票', val:'¥250-400' },{ icon:'&#127915;', label:'其他', val:'¥150-200' }]
+  ],
+  standard: [
+    [{ icon:'&#127968;', label:'住宿', val:'¥600-1,200' },{ icon:'&#127834;', label:'餐饮', val:'¥400-800' },{ icon:'&#128663;', label:'交通/门票', val:'¥200-500' },{ icon:'&#127915;', label:'其他', val:'¥300-500' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥500-1,000' },{ icon:'&#127834;', label:'餐饮', val:'¥350-700' },{ icon:'&#128663;', label:'交通/门票', val:'¥150-400' },{ icon:'&#127915;', label:'其他', val:'¥200-400' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥1,200-2,500' },{ icon:'&#127834;', label:'餐饮', val:'¥1,000-1,800' },{ icon:'&#128663;', label:'交通/门票', val:'¥400-800' },{ icon:'&#127915;', label:'其他', val:'¥400-900' }]
+  ],
+  premium: [
+    [{ icon:'&#127968;', label:'住宿', val:'¥1,800-3,500' },{ icon:'&#127834;', label:'餐饮', val:'¥1,000-2,000' },{ icon:'&#128663;', label:'交通/门票', val:'¥500-1,000' },{ icon:'&#127915;', label:'其他', val:'¥700-1,500' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥1,500-3,000' },{ icon:'&#127834;', label:'餐饮', val:'¥900-1,800' },{ icon:'&#128663;', label:'交通/门票', val:'¥400-900' },{ icon:'&#127915;', label:'其他', val:'¥700-1,300' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥3,500-7,000' },{ icon:'&#127834;', label:'餐饮', val:'¥2,000-4,000' },{ icon:'&#128663;', label:'交通/门票', val:'¥1,000-2,000' },{ icon:'&#127915;', label:'其他', val:'¥1,500-2,000' }]
+  ],
+  luxury: [
+    [{ icon:'&#127968;', label:'住宿', val:'¥5,000-10,000' },{ icon:'&#127834;', label:'餐饮', val:'¥2,000-5,000' },{ icon:'&#128663;', label:'交通/门票', val:'¥1,000-2,500' },{ icon:'&#127915;', label:'其他', val:'¥2,000-2,500' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥4,000-9,000' },{ icon:'&#127834;', label:'餐饮', val:'¥1,800-4,500' },{ icon:'&#128663;', label:'交通/门票', val:'¥800-2,000' },{ icon:'&#127915;', label:'其他', val:'¥1,400-2,500' }],
+    [{ icon:'&#127968;', label:'住宿', val:'¥10,000-15,000' },{ icon:'&#127834;', label:'餐饮', val:'¥3,000-8,000' },{ icon:'&#128663;', label:'交通/门票', val:'¥2,000-4,000' },{ icon:'&#127915;', label:'其他', val:'¥3,000-5,000' }]
+  ]
+};
+
+/* 问题3修复：费用计算改为按总人数展示 */
+function calcTotalCost(level, guests, rooms, days) {
+  var partner = WUHAN_VENUES.partner_hotels;
+  var costPerRoom = 0;
+  
+  // 住宿费用计算：房间数 × 每间夜价格 × 天数
+  if (level === 'economy' || level === 'important') {
+    costPerRoom = partner.juzi.price; // 298
+  } else if (level === 'vip') {
+    costPerRoom = 550 + Math.floor(Math.random() * 130); // 550-680
+  } else if (level === 'vvip') {
+    costPerRoom = 600 + Math.floor(Math.random() * 80); // 600-680
+  }
+  var hotelCost = costPerRoom * rooms * days;
+  
+  // 餐饮费用计算：人均 × 人数 × 餐数（按天数估算每天3餐）
+  var mealCostPerPerson = level === 'economy' ? 100 : level === 'important' ? 150 : level === 'vip' ? 250 : 400;
+  var mealsPerDay = 3;
+  var foodCost = mealCostPerPerson * guests * days * mealsPerDay;
+  
+  // 交通/门票：总费用
+  var transportCost = level === 'economy' ? 200 : level === 'important' ? 400 : level === 'vip' ? 800 : 1500;
+  
+  // 其他费用
+  var otherCost = level === 'economy' ? 100 : level === 'important' ? 200 : level === 'vip' ? 500 : 1000;
+  
+  var total = hotelCost + foodCost + transportCost + otherCost;
+  
+  return {
+    hotel: hotelCost,
+    hotelDetail: rooms + '间×' + days + '晚',
+    food: foodCost,
+    foodDetail: guests + '人×' + (days * mealsPerDay) + '餐',
+    transport: transportCost,
+    other: otherCost,
+    total: total
+  };
+}
+
+function planHTML(planCfg, idx) {
+  var itemsHtml = planCfg.schedule.map(function(s){
+    return '<div class="ps-item">' +
+      '<span class="ps-time">' + s.time + '</span>' +
+      '<div class="ps-content">' +
+        '<div class="ps-name">' + (CAT_ICON[s.cat]||'&#128221;') + ' ' + s.name + '</div>' +
+        '<div class="ps-note">' + s.note + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  var warnsHtml = planCfg.warns.length ? '<div class="warn-box"><div class="w-title">&#9888; 注意事项</div>' + planCfg.warns.join('<br>') + '</div>' : '';
+  var tagsHtml = planCfg.tags.map(function(t){ return '<span class="ptag">' + t + '</span>'; }).join('');
+
+  // 问题3修复：费用明细按总费用展示
+  var costDetailRows = '';
+  if (planCfg.costDetail) {
+    costDetailRows += '<div class="cost-detail-row"><span class="cd-label"><span class="cd-icon">&#127968;</span>住宿(' + planCfg.costDetail.hotelDetail + ')</span><span class="cd-val">¥' + planCfg.costDetail.hotel.toLocaleString() + '</span></div>';
+    costDetailRows += '<div class="cost-detail-row"><span class="cd-label"><span class="cd-icon">&#127834;</span>餐饮(' + planCfg.costDetail.foodDetail + ')</span><span class="cd-val">¥' + planCfg.costDetail.food.toLocaleString() + '</span></div>';
+    costDetailRows += '<div class="cost-detail-row"><span class="cd-label"><span class="cd-icon">&#128663;</span>交通/门票</span><span class="cd-val">¥' + planCfg.costDetail.transport.toLocaleString() + '</span></div>';
+    costDetailRows += '<div class="cost-detail-row"><span class="cd-label"><span class="cd-icon">&#127915;</span>其他</span><span class="cd-val">¥' + planCfg.costDetail.other.toLocaleString() + '</span></div>';
+    costDetailRows += '<div class="cost-detail-row"><span class="cd-label">合计</span><span class="cd-val">¥' + planCfg.costDetail.total.toLocaleString() + '</span></div>';
+  }
+
+  return '<div class="plan-card" id="plan-' + idx + '" onclick="selectPlan(' + idx + ')">' +
+    '<div class="plan-badge" id="badge-' + idx + '">&#10003; 已选</div>' +
+    '<div class="plan-header">' +
+      '<div class="plan-style">' +
+        '<div class="plan-style-icon" style="background:' + planCfg.iconBg + '">' + planCfg.icon + '</div>' +
+        '<div><div class="plan-name">方案' + ['一','二','三'][idx] + ' · ' + planCfg.name + '</div>' +
+        '<div class="plan-sub">' + planCfg.summary + '</div></div>' +
+      '</div>' +
+      '<div class="plan-tags">' + tagsHtml + '</div>' +
+    '</div>' +
+    '<div class="plan-body">' +
+      '<div class="plan-section"><div class="ps-label">行程安排</div>' + itemsHtml + '</div>' +
+      warnsHtml +
+    '</div>' +
+    '<div class="cost-row"><span class="cost-label">预估费用（总费用）</span>' +
+    '<span class="cost-val">¥' + (planCfg.costDetail ? planCfg.costDetail.total.toLocaleString() : planCfg.cost) + '</span></div>' +
+    '<div class="cost-detail">' + costDetailRows + '</div></div>';
+}
+
+function selectPlan(idx) {
+  var cards = document.querySelectorAll('.plan-card');
+  for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('selected'); }
+  var badges = document.querySelectorAll('[id^="badge-"]');
+  for (var j = 0; j < badges.length; j++) { badges[j].style.display = 'none'; }
+  document.getElementById('plan-' + idx).classList.add('selected');
+  document.getElementById('badge-' + idx).style.display = 'flex';
+}
+
+function buildSummaryText(level, origins, religions, foods, activities, budget, days, guests, rooms) {
+  var lvMeta = LEVEL_META[level] || LEVEL_META.economy;
+  var originStr = origins.length ? origins.map(function(o){ return ORIGIN_NAMES[o]; }).join('、') : '未指定';
+  var relMap = { none:'无禁忌', muslim:'穆斯林', islam:'清真', jewish:'洁食', hindu:'印度教素食', buddhist:'佛教素食', christian:'基督教', no_pork:'禁猪肉', no_beef:'禁牛肉', no_alcohol:'禁酒', vegan:'纯素', no_seafood:'禁海鲜' };
+  var relStr = religions.length ? religions.map(function(r){ return relMap[r]||r; }).join('、') : '无特殊禁忌';
+  return lvMeta.icon + ' <strong>' + lvMeta.name + '</strong> · ' + guests + '人/' + rooms + '间房 · 来源：' + originStr + ' · 禁忌：' + relStr + ' · ' + days + '天';
+}
+
+function getSeason(month) {
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  if (month >= 9 && month <= 11) return 'autumn';
+  return 'winter';
+}
+
+function getSeasonName(month) {
+  return { 1:'冬',2:'冬',3:'春',4:'春',5:'春',6:'夏',7:'夏',8:'夏',9:'秋',10:'秋',11:'秋',12:'冬' }[month] || '';
+}
+
+function getSeasonFood(month) {
+  var season = getSeason(month);
+  return SEASONAL_FOOD[season];
+}
+
+function checkTrafficEvents(month, day) {
+  var alerts = [];
+  for (var i = 0; i < WUHAN_EVENTS.length; i++) {
+    var ev = WUHAN_EVENTS[i];
+    var inRange = false;
+    if (ev.endMonth) {
+      // Multi-day event
+      var startDate = ev.month * 100 + ev.day;
+      var endDate = ev.endMonth * 100 + ev.endDay;
+      var checkDate = month * 100 + day;
+      inRange = checkDate >= startDate && checkDate <= endDate;
+    } else {
+      inRange = (month === ev.month && day === ev.day);
+    }
+    if (inRange) {
+      alerts.push(ev);
+    }
+  }
+  // Also check events within 3 days proximity
+  for (var j = 0; j < WUHAN_EVENTS.length; j++) {
+    var e = WUHAN_EVENTS[j];
+    if (e.level === 'low') continue;
+    var evDate = e.month * 100 + (e.day || 1);
+    var endDate2 = (e.endMonth || e.month) * 100 + (e.endDay || e.day);
+    var checkD = month * 100 + day;
+    var startDist = Math.abs(checkD - evDate);
+    var endDist = Math.abs(checkD - endDate2);
+    // Check proximity (within 3 days before event start)
+    var alreadyAdded = alerts.some(function(a){ return a.name === e.name; });
+    if (!alreadyAdded && (startDist <= 3 || endDist <= 3)) {
+      alerts.push(Object.assign({}, e, { _proximity: true }));
+    }
+  }
+  return alerts;
+}
+
+function updateDateTips() {
+  var dateInput = document.getElementById('date-input');
+  var tipArea = document.getElementById('date-tip-area');
+  if (!dateInput.value) { tipArea.innerHTML = ''; return; }
+  var parts = dateInput.value.split('-');
+  var month = parseInt(parts[1]);
+  var day = parseInt(parts[2]);
+  var season = getSeason(month);
+  var food = SEASONAL_FOOD[season];
+  var events = checkTrafficEvents(month, day);
+
+  var html = '';
+  // Seasonal food recommendation
+  if (food) {
+    html += '<div class="food-recommend">' +
+      '<strong>' + food.emoji + ' ' + food.name + '（' + getSeasonName(month) + '季）推荐</strong><br>';
+    for (var i = 0; i < Math.min(food.dishes.length, 4); i++) {
+      html += food.dishes[i] + '<br>';
+    }
+    html += '<span style="color:#888">推荐餐厅：' + food.restaurants.join('、') + '</span><br>';
+    html += '<span style="color:#888">\u{1F4A1} ' + food.tips + '</span></div>';
+  }
+
+  // Traffic alerts
+  var realAlerts = events.filter(function(e){ return !e._proximity; });
+  var proxAlerts = events.filter(function(e){ return e._proximity; });
+  if (realAlerts.length > 0) {
+    html += '<div class="traffic-alert"><strong>\u{26A0} 当日有大型活动</strong><br>';
+    for (var j = 0; j < realAlerts.length; j++) {
+      var e = realAlerts[j];
+      html += '\u{1F534} <strong>' + e.name + '</strong>（' + (e.level==='high'?'严重':e.level==='medium'?'中等':'轻微') + '）<br>';
+      html += '&nbsp;&nbsp;影响区域：' + e.area + '<br>';
+      html += '&nbsp;&nbsp;管制路段：' + e.roads + '<br>';
+      html += '&nbsp;&nbsp;出行建议：' + e.impact + '</br>';
+      if (e.tip) html += '&nbsp;&nbsp;\u{1F4A1} ' + e.tip + '<br>';
+    }
+    html += '</div>';
+  }
+  if (proxAlerts.length > 0) {
+    html += '<div class="season-tip"><strong>\u{1F7E1} 临近活动提醒</strong><br>';
+    for (var k = 0; k < proxAlerts.length; k++) {
+      var p = proxAlerts[k];
+      html += '\u{1F7E0} ' + p.name + '即将举办，附近区域可能提前管控<br>';
+      if (p.tip) html += '&nbsp;&nbsp;' + p.tip + '<br>';
+    }
+    html += '</div>';
+  }
+  tipArea.innerHTML = html;
+}
+
+// Add date change listener
+document.addEventListener('DOMContentLoaded', function() {
+  var dateInput = document.getElementById('date-input');
+  if (dateInput) {
+    dateInput.addEventListener('change', updateDateTips);
+  }
+});
+
+/* ===== 在方案生成中注入季节美食和交通提醒 ===== */
+/* 问题1、2、3、4修复：generatePlans增强
+ * - 维护已用餐厅和景点列表
+ * - 按区域规划路线
+ * - 费用按总人数计算
+ */
+function generatePlans() {
+  // 先检查是否已选择酒店预定等级
+  if (!checkLevelSelected()) return;
+  
+  var level = state.level || 'economy';
+  var budget = state.budget || 'standard';
+  var days = Math.max(1, Math.min(7, parseInt(document.getElementById('days-input').value) || 2));
+  var origins = getActive('origin');
+  var religions = getActive('religion');
+  var foods = getActive('food');
+  var activities = getActive('activity');
+  var specials = getActive('special');
+  var dateInput = document.getElementById('date-input');
+  var visitMonth = dateInput.value ? parseInt(dateInput.value.split('-')[1]) : new Date().getMonth() + 1;
+  var visitDay = dateInput.value ? parseInt(dateInput.value.split('-')[2]) : new Date().getDate();
+
+  // 计算房间数
+  var guests = parseInt(document.getElementById('guest-count').value) || 1;
+  var roomType = document.getElementById('room-type').value;
+  var canShare = document.getElementById('share-room').checked;
+  var rooms = 1;
+  if (roomType === 'suite') {
+    rooms = Math.ceil(guests / 2);
+  } else if (roomType === 'twin') {
+    rooms = Math.ceil(guests / 2);
+  } else if (roomType === 'double') {
+    rooms = canShare ? Math.ceil(guests / 2) : guests;
+  } else {
+    rooms = guests;
+  }
+
+  // 需求1: 检查预算冲突
+  var budgetCheck = checkBudgetConflict(level, rooms, days, budget);
+  if (budgetCheck.conflict) {
+    var userChoice = confirm(budgetCheck.message + '\n\n点击"确定"继续生成方案，点击"取消"返回调整。');
+    if (!userChoice) return;
+  }
+
+  // 接机接站信息
+  var bringGift = document.getElementById('bring-gift').checked;
+  var transports = getActive('transport');
+  var stations = getActive('station');
+  var pickupInfo = '';
+  var pickupTime = ''; // 接机时间（用于行程起始）
+  if (transports.length > 0) {
+    var pickupDetails = [];
+    if (transports.includes('plane')) {
+      var planeTime = document.getElementById('plane-time').value || '待定';
+      pickupDetails.push('武汉天河国际机场（' + planeTime + '）');
+      pickupTime = planeTime;
+    }
+    if (transports.includes('train')) {
+      var trainTime = document.getElementById('train-time').value || '待定';
+      var stationNames = stations.length > 0 ? stations : ['火车站'];
+      pickupDetails.push(stationNames.join('、') + '（' + trainTime + '）');
+      if (!pickupTime) pickupTime = trainTime;
+    }
+    pickupInfo = '接机/接站：' + pickupDetails.join(' + ') + (bringGift ? ' · 携带伴手礼' : '');
+  }
+
+  var mainArea = document.getElementById('main-area');
+  mainArea.innerHTML = '<div class="loading"><span class="spinner"></span>正在智能生成接待方案...</div>';
+
+  setTimeout(function() {
+    var warns = [];
+    var hasNone = religions.indexOf('none') >= 0;
+    if (!hasNone) {
+    if (religions.indexOf('islam') >= 0 || religions.indexOf('no_pork') >= 0 || religions.indexOf('muslim') >= 0)
+      warns.push('\u{2625} 清真要求：所有餐厅须取得清真认证，注意午后礼拜时间（周五13:00-15:00避免安排活动）');
+    if (religions.indexOf('no_alcohol') >= 0)
+      warns.push('\u{26A0} 全程禁酒：餐桌无酒精，敬酒改用果汁/矿泉水，避免安排酒吧场所');
+    if (religions.indexOf('jewish') >= 0)
+      warns.push('\u{2721} 洁食要求：需提前联系认证洁食餐厅，肉类和乳制品不可同餐出现');
+    if (religions.indexOf('vegan') >= 0 || religions.indexOf('hindu') >= 0)
+      warns.push('\u{1F333} 素食要求：确认厨房未使用动物油，连汤底也须确认');
+    }
+    if (origins.indexOf('mideast') >= 0)
+      warns.push('\u{1F3F4} 中东礼仪：正式会面时男女握手需等待对方先伸手；不宜安排异性单独同行');
+    if (specials.indexOf('interpeter') >= 0)
+      warns.push('\u{1F4DC} 翻译安排：请提前确认目标语言（英/日/韩/阿/法/俄），建议提前1周预约专业涉外翻译');
+    if (specials.indexOf('gift') >= 0)
+      warns.push('\u{1F381} 礼品选择：针对不同文化准备适宜礼品。中东/穆斯林客户避免酒类；欧美客户偏好地方特产；亚洲客户注重包装');
+    if (activities.indexOf('hq_visit') >= 0)
+      warns.push('\u{1F3E2} 总部参观：请提前1天确认会议室预订、茶歇布置、企业宣传片设备调试、展厅清洁，并提前制作电子屏欢迎词（如"热烈欢迎XXX公司领导莅临指导"）');
+    if (activities.indexOf('factory_visit') >= 0)
+      warns.push('\u{1F3ED} 工厂考察：新洲区工厂车程约1小时，需提前协调产线参观时间、安全帽/防护装备准备、车间5S整理');
+
+    // Seasonal food tip
+    var foodInfo = getSeasonFood(visitMonth);
+    if (foodInfo) {
+      warns.push(foodInfo.emoji + ' 时令美食：' + getSeasonName(visitMonth) + '季推荐' + foodInfo.dishes.slice(0,2).join('、') + '。' + foodInfo.tips);
+    }
+
+    // Traffic event warnings
+    var trafficEvents = checkTrafficEvents(visitMonth, visitDay);
+    var realEvents = trafficEvents.filter(function(e){ return !e._proximity; });
+    for (var te = 0; te < realEvents.length; te++) {
+      var ev = realEvents[te];
+      warns.push('\u{1F6A8} 交通管制：' + ev.name + '当日影响' + ev.area + '，' + ev.impact);
+    }
+    
+    // 需求5: 添加智能排餐提示
+    if (transports.length > 0 && pickupTime && pickupTime !== '待定') {
+      var timeParts = pickupTime.split(':');
+      var hour = parseInt(timeParts[0]) || 8;
+      var mealPlan = getMealPlanByArrivalTime(hour);
+      warns.push('\u{1F37D} 智能排餐：' + mealPlan.desc + '（根据到达时间' + pickupTime + '自动安排）');
+    }
+
+    var styles = [
+      { style:'formal',  name:'商务正式', icon:'\u{1F454}', iconBg:'#E6F1FB', tags:['正式商务','专业讲解','VIP通道','包厢宴请'], summary:'全程专业接待，强调尊重与仪式感' },
+      { style:'relaxed', name:'轻松文化', icon:'\u{1F338}', iconBg:'#EEEDFE', tags:['文化体验','轻松氛围','夜游项目','互动交流'], summary:'融入武汉文化，拉近双方距离' },
+      { style:'deep',    name:'高端定制', icon:'\u{1F451}', iconBg:'#FAEEDA', tags:['私人管家','专属服务','顶级餐饮','深度商谈'], summary:'极致尊享服务，彰显合作诚意' }
+    ];
+
+    /* 问题1、2修复：为每个方案维护独立的已用餐厅和景点列表 */
+    var planCards = styles.map(function(s, i){
+      var daySchedules = [];
+      var usedRestaurants = []; // 问题1修复：维护已用餐厅列表
+      var usedSights = []; // 问题2修复：维护已用景点列表
+      
+      // 需求5: 行程从接机/接站开始
+      for (var d = 0; d < Math.min(days, 2); d++) {
+        var dayActivities = d === 0 ? activities : activities.filter(function(a){ return a !== 'hq_visit' && a !== 'factory_visit'; });
+        
+        // 问题4修复：按区域规划，每天尽量在同片区活动
+        // 工厂考察单独安排在新洲片区
+        var dayResult = buildDaySchedule(
+          level, religions, foods, dayActivities, budget, d, s.style, 
+          pickupInfo, pickupTime, transports.length > 0,
+          usedRestaurants, usedSights, guests, rooms
+        );
+        
+        // 收集当天使用的餐厅和景点
+        usedRestaurants = usedRestaurants.concat(dayResult.usedRestaurants.filter(function(r) { return usedRestaurants.indexOf(r) === -1; }));
+        usedSights = usedSights.concat(dayResult.usedSights.filter(function(sn) { return usedSights.indexOf(sn) === -1; }));
+        
+        daySchedules = daySchedules.concat(dayResult.schedule);
+      }
+      
+      // 问题3修复：计算总费用（按人数）
+      var costDetail = calcTotalCost(level, guests, rooms, days);
+      
+      return planHTML({
+        style:s.style, name:s.name, icon:s.icon, iconBg:s.iconBg, tags:s.tags,
+        summary:s.summary + ' · ' + guests + '人/' + rooms + '间',
+        schedule: daySchedules.slice(0, days > 1 ? 12 : 8),
+        warns: i === 0 ? warns : warns.slice(0, Math.min(2, warns.length)),
+        cost: '¥' + Math.round(costDetail.total) + '起/人',
+        costDetail: costDetail
+      }, i);
+    });
+
+    var summaryText = buildSummaryText(level, origins, religions, foods, activities, budget, days, guests, rooms);
+
+    // Build season + traffic info bar
+    var infoBar = '';
+    if (foodInfo) {
+      infoBar += '<div class="food-recommend" style="margin-bottom:10px"><strong>' + foodInfo.emoji + ' ' + foodInfo.name + '美食推荐</strong>：' +
+        foodInfo.dishes.slice(0,3).join(' · ') +
+        '<br><span style="color:#0F6E56">推荐餐厅：' + foodInfo.restaurants.slice(0,3).join('、') + '</span></div>';
+    }
+    if (realEvents.length > 0) {
+      infoBar += '<div class="traffic-alert" style="margin-bottom:10px"><strong>\u{1F6A8} 交通管制提醒</strong>：';
+      for (var ei = 0; ei < realEvents.length; ei++) {
+        var e2 = realEvents[ei];
+        infoBar += (ei > 0 ? '<br>' : '') + e2.name + '影响' + e2.area + '（' + e2.roads + '），' + e2.impact;
+      }
+      infoBar += '</div>';
+    }
+
+    mainArea.innerHTML =
+      '<div class="summary-bar">\u{1F4CC} 当前配置：' + summaryText + '</div>' +
+      infoBar +
+      '<div class="plans-grid">' + planCards.join('') + '</div>' +
+      '<div style="margin-top:14px;font-size:12px;color:#aaa;text-align:center">点击方案卡片可选中 · 方案基于武汉本地真实场馆数据生成 · 具体安排需提前确认预订</div>' +
+      '<div style="margin-top:6px;font-size:11px;color:#ccc;text-align:center">场馆信息来自网络实时查询（2026年5月核实），协议酒店优先使用 · 费用按总人数计算</div>';
+  }, 900);
+}
+</script>
+</body>
+</html>
